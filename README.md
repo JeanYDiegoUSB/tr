@@ -1,2 +1,2 @@
 # tr
-CI3661 Task on Object-oriented programming
+CI3661 Task on Object-Oriented Programming
