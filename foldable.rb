@@ -18,12 +18,6 @@ class Rose
 	def foldr e, &b
 		result = e
 		self.children.reverse_each {|tree| result = tree.foldr result, &b}
-		result = b.call(self.elem,result)
-		result
+		b.call(self.elem,result)
 	end
 end
-
-tree = Rose.new(1, [Rose.new(2, [ Rose.new(4), Rose.new(5) ]),Rose.new(3, [ Rose.new(6) ])])
-suma = tree.foldr(0) {|x,y| x + y}
-producto = tree.foldr(1) {|x,y| x * y}
-puts "La suma del árbol es #{suma} y su producto es #{producto}"
