@@ -1,3 +1,10 @@
+module Foldable
+	def null 
+		
+	end
+end
+
+
 class Array
 	def foldr e, &b
 		result = e
