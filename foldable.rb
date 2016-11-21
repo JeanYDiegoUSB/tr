@@ -63,4 +63,9 @@ include Foldable
 		self.children.reverse_each {|tree| result = tree.foldr result, &b}
 		b.call(self.elem,result)
 	end
+	def avg
+		average = self.foldr([0,0.0]) {|x,y| [x+y[0],1+y[1]]}
+		#average = [self.foldr1 {|x,y| x + y},self.length.to_f]
+		average[0]/average[1]
+	end
 end
