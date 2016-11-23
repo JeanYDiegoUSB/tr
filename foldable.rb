@@ -64,12 +64,8 @@ include Foldable
 		b.call(self.elem,result)
 	end
 	def avg
-		average = self.foldr1 do |x,y|
-			if y.is_a? Array
-			then [x+y[0],1+y[1]]
-			else [x+y,2.0]
-			end
-		end
-		average[0]/average[1]
+		size = 1.0
+		average = self.foldr1 {|x,y| size+=1; x+y}
+		average/size
 	end
 end
