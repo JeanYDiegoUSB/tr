@@ -4,7 +4,11 @@ end
 
 class Literal < Interval
 	def initialize x, y, x_i, y_i
-		@x, @y, @x_i, @y_i = x, y, x_i, y_i
+		if x < y || (x == y && x_i && y_i)
+			@x, @y, @x_i, @y_i = x, y, x_i, y_i
+		else
+			raise 'no existe el intervalo'
+		end
 	end
 	def to_s
 		if x_i then
@@ -23,6 +27,101 @@ class Literal < Interval
 	end
 	def intersection other
 		other.intersection_literal self
+	end
+	def intersection_literal it
+		if self.y > it.x && it.y > self.x
+			if self.x > it.x
+				if self.y > it.y
+					Literal.new(self.x,it.y,self.x_i,it.y_i)
+				elsif self.y < it.y
+					Literal.new(self.x,self.y,self.x_i,self.y_i)
+				else
+					if self.y_i
+						Literal.new(self.x,it.y,self.x_i,it.y_i)
+					else
+						Literal.new(self.x,self.y,self.x_i,self.y_i)
+					end
+				end
+			elsif self.x < it.x
+				if self.y > it.y
+					Literal.new(it.x,it.y,it.x_i,it.y_i)
+				elsif self.y < it.y
+					Literal.new(it.x,self.y,it.x_i,self.y_i)
+				else
+					if self.y_i
+						Literal.new(it.x,it.y,it.x_i,it.y_i)
+					else
+						Literal.new(it.x,self.y,it.x_i,self.y_i)
+					end
+				end
+			else
+				if self.x_i
+					if self.y > it.y
+						Literal.new(it.x,it.y,it.x_i,it.y_i)
+					elsif self.y < it.y
+						Literal.new(it.x,self.y,it.x_i,self.y_i)
+					else
+						if self.y_i
+							Literal.new(it.x,it.y,it.x_i,it.y_i)
+						else
+							Literal.new(it.x,self.y,it.x_i,self.y_i)
+						end
+					end
+				else
+					if self.y > it.y
+						Literal.new(self.x,it.y,self.x_i,it.y_i)
+					elsif self.y < it.y
+						Literal.new(self.x,self.y,self.x_i,self.y_i)
+					else
+						if self.y_i
+							Literal.new(self.x,it.y,self.x_i,it.y_i)
+						else
+							Literal.new(self.x,self.y,self.x_i,self.y_i)
+						end
+					end
+				end
+			end
+		elsif self.x == it.y && self.x_i && it.y_i
+			Literal.new(self.x,self.x,self.x_i,self.x_i)
+		elsif self.y == it.x && self.y_i && it.x_i
+			Literal.new(self.y,self.y,self.y_i,self.y_i)
+		else
+			$vacio
+		end
+	end
+	def intersection_rinfinite it
+		if self.y > it.x
+			if self.x > it.x
+				Literal.new(self.x,self.y,self.x_i,self.y_i)
+			elsif self.x < it.x
+				Literal.new(it.x,self.y,it.x_i,self.y_i)
+			else
+				if self.x_i
+					Literal.new(it.x,self.y,it.x_i,self.y_i)
+				else
+					Literal.new(self.x,self.y,self.x_i,self.y_i)
+				end
+			end
+		else
+			$vacio
+		end
+	end
+	def intersection_linfinite it
+		if self.x < it.y
+			if self.y > it.y
+				Literal.new(self.x,it.y,self.x_i,it.y_i)
+			elsif self.y < it.y
+				Literal.new(self.x,self.y,self.x_i,self.y_i)
+			else
+				if self.y_i
+					Literal.new(self.x,it.y,self.x_i,it.y_i)
+				else
+					Literal.new(self.x,self.y,self.x_i,self.y_i)
+				end
+			end
+		else
+			$vacio
+		end
 	end
 	def union other
 		other.union_literal self
@@ -146,6 +245,43 @@ class RightInfinite < Interval
 	def intersection other
 		other.intersection_rinfinite self
 	end
+	def intersection_literal it
+		if self.x < it.y
+			if self.x > it.x
+				Literal.new(self.x,it.y,self.x_i,it.y_i)
+			elsif self.x < it.x
+				Literal.new(it.x,it.y,it.x_i,it.y_i)
+			else
+				if self.x_i
+					Literal.new(it.x,it.y,it.x_i,it.y_i)
+				else
+					Literal.new(self.x,it.y,self.x_i,it.y_i)
+				end
+			end
+		else
+			$vacio
+		end
+	end
+	def intersection_rinfinite it
+		if self.x > it.x
+			self
+		elsif self.x < it.x
+			it
+		else
+			if self.x_i
+				it
+			else
+				self
+			end
+		end
+	end
+	def intersection_linfinite it
+		if self.x < it.y || (self.x == it.y && self.x_i && it.y_i)
+			Literal.new(self.x,it.y,self.x_i,it.y_i)
+		else
+			$vacio
+		end
+	end
 	def union other
 		other.union_rinfinite self
 	end
@@ -209,6 +345,43 @@ class LeftInfinite < Interval
 	end
 	def intersection other
 		other.intersection_linfinite self
+	end
+	def intersection_literal it
+		if self.y > it.x
+			if self.y > it.y
+				Literal.new(it.x,it.y,it.x_i,it.y_i)
+			elsif self.y < it.y
+				Literal.new(it.x,self.y,it.x_i,self.y_i)
+			else
+				if self.y_i
+					Literal.new(it.x,it.y,it.x_i,it.y_i)
+				else
+					Literal.new(it.x,self.y,it.x_i,self.y_i)
+				end
+			end
+		else
+			$vacio
+		end
+	end
+	def intersection_rinfinite it
+		if self.y > it.x || (self.y == it.x && self.y_i && it.x_i)
+			Literal.new(it.x,self.y,it.x_i,self.y_i)
+		else
+			$vacio
+		end
+	end
+	def intersection_linfinite it
+		if self.y < it.y
+			self
+		elsif self.y > it.y
+			it
+		else
+			if self.y_i
+				it
+			else
+				self
+			end
+		end
 	end
 	def union other
 		other.union_linfinite self
