@@ -1,27 +1,25 @@
+require 'singleton'
+
 class Interval
 	attr_reader :x, :y, :x_i, :y_i
 end
 
 class Literal < Interval
 	def initialize x, y, x_i, y_i
-		if x < y || (x == y && x_i && y_i)
-			@x, @y, @x_i, @y_i = x, y, x_i, y_i
-		else
-			raise 'no existe el intervalo'
-		end
+		@x, @y, @x_i, @y_i = x, y, x_i, y_i
 	end
 	def to_s
-		if x_i then
-			if y_i then
-				"["+x.to_s+","+y.to_s+"]"
+		if @x_i then
+			if @y_i then
+				"["+@x.to_s+","+@y.to_s+"]"
 			else
-				"["+x.to_s+","+y.to_s+")"
+				"["+@x.to_s+","+@y.to_s+")"
 			end
 		else
-			if y_i then
-				"("+x.to_s+","+y.to_s+"]"
+			if @y_i then
+				"("+@x.to_s+","+@y.to_s+"]"
 			else
-				"("+x.to_s+","+y.to_s+")"
+				"("+@x.to_s+","+@y.to_s+")"
 			end
 		end
 	end
@@ -86,7 +84,7 @@ class Literal < Interval
 		elsif self.y == it.x && self.y_i && it.x_i
 			Literal.new(self.y,self.y,self.y_i,self.y_i)
 		else
-			$vacio
+			Empty.instance
 		end
 	end
 	def intersection_rinfinite it
@@ -103,7 +101,7 @@ class Literal < Interval
 				end
 			end
 		else
-			$vacio
+			Empty.instance
 		end
 	end
 	def intersection_linfinite it
@@ -120,7 +118,7 @@ class Literal < Interval
 				end
 			end
 		else
-			$vacio
+			Empty.instance
 		end
 	end
 	def union other
@@ -236,10 +234,10 @@ class RightInfinite < Interval
 		@x, @x_i = x, x_i
 	end
 	def to_s
-		if x_i then
-			"["+x.to_s+",)"
+		if @x_i then
+			"["+@x.to_s+",)"
 		else
-			"("+x.to_s+",)"
+			"("+@x.to_s+",)"
 		end
 	end
 	def intersection other
@@ -259,7 +257,7 @@ class RightInfinite < Interval
 				end
 			end
 		else
-			$vacio
+			Empty.instance
 		end
 	end
 	def intersection_rinfinite it
@@ -279,7 +277,7 @@ class RightInfinite < Interval
 		if self.x < it.y || (self.x == it.y && self.x_i && it.y_i)
 			Literal.new(self.x,it.y,self.x_i,it.y_i)
 		else
-			$vacio
+			Empty.instance
 		end
 	end
 	def union other
@@ -321,7 +319,7 @@ class RightInfinite < Interval
 	end
 	def union_linfinite it
 		if it.y > self.x || (self.x == it.y && (self.x_i || it.y_i))
-			$reales
+			AllReals.instance
 		else
 			begin
 				raise 'no existe el intervalo '+self.to_s+' | '+it.to_s
@@ -337,10 +335,10 @@ class LeftInfinite < Interval
 		@y, @y_i = y, y_i
 	end
 	def to_s
-		if y_i then
-			"(,"+y.to_s+"]"
+		if @y_i then
+			"(,"+@y.to_s+"]"
 		else
-			"(,"+y.to_s+")"
+			"(,"+@y.to_s+")"
 		end
 	end
 	def intersection other
@@ -360,14 +358,14 @@ class LeftInfinite < Interval
 				end
 			end
 		else
-			$vacio
+			Empty.instance
 		end
 	end
 	def intersection_rinfinite it
 		if self.y > it.x || (self.y == it.x && self.y_i && it.x_i)
 			Literal.new(it.x,self.y,it.x_i,self.y_i)
 		else
-			$vacio
+			Empty.instance
 		end
 	end
 	def intersection_linfinite it
@@ -409,7 +407,7 @@ class LeftInfinite < Interval
 	end
 	def union_rinfinite it
 		if it.x < self.y || (self.y == it.x && (self.y_i || it.x_i))
-			$reales
+			AllReals.instance
 		else
 			begin
 				raise 'no existe el intervalo '+self.to_s+' | '+it.to_s
@@ -434,6 +432,8 @@ class LeftInfinite < Interval
 end
 
 class AllReals < Interval
+	include Singleton
+	
 	def to_s
 		"(,)"
 	end
@@ -446,6 +446,8 @@ class AllReals < Interval
 end
 
 class Empty < Interval
+	include Singleton
+	
 	def to_s
 		"empty"
 	end
@@ -457,5 +459,59 @@ class Empty < Interval
 	end
 end
 
-$reales = AllReals.new
-$vacio = Empty.new
+def crear_intervalo s, n
+	if s.eql? "< "
+		LeftInfinite.new(n.to_i,false)
+	elsif s.eql? "<= "
+		LeftInfinite.new(n.to_i,true)
+	elsif s.eql? "> "
+		RightInfinite.new(n.to_i,false)
+	elsif s.eql? ">= "
+		RightInfinite.new(n.to_i,true)
+	end
+end
+
+$reales = AllReals.instance
+$vacio = Empty.instance
+el_hash = Hash.new($reales)
+print "Ingrese el nombre del archivo a cargar: "
+archivo = gets.chomp
+IO.foreach(archivo) do |line|
+	arr = line.lines(" ")
+	i = 0
+	while i < arr.length
+		arr[i].rstrip!
+		if ("a".."z").include? arr[i]
+			if el_hash.has_key? arr[i]
+				if arr[i-1].eql? "&"
+					el_hash[arr[i]] = el_hash[arr[i]].intersection crear_intervalo arr[i+1], arr[i+2]
+				else
+					el_hash[arr[i]] = el_hash[arr[i]].union crear_intervalo arr[i+1], arr[i+2]
+				end
+			else
+				el_hash[arr[i]] = el_hash[arr[i]].intersection crear_intervalo arr[i+1], arr[i+2]
+			end
+		end
+		i += 1
+	end	
+end
+puts "Las variables disponibles son:"
+el_hash.each {|key,value| puts "  #{key} in #{value}"}
+puts
+
+while true
+	puts "\tIngrese «variable» «operador» «variable», donde"
+	puts "\t«operador» puede ser & ó |, y «variable» es alguna"
+	puts "\tde las variables mostradas anteriormente"
+	linea = gets.chomp.lines(" ").each {|x| x.rstrip!}
+	if linea[0] == "exit"
+		puts "\tLa calculadora termino su ejecucion"; break
+	end
+	print "El resultado es: "
+	if linea[1] == "&"
+		puts el_hash[linea[0]].intersection el_hash[linea[2]]
+	elsif linea[1] == "|"
+		puts el_hash[linea[0]].union el_hash[linea[2]]
+	end
+	puts
+end
