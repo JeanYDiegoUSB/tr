@@ -654,12 +654,66 @@ class AllReals < Interval
 		other
 	end
 	
+	# Método intersection_literal
+	#
+	# Retorna un nuevo intervalo que representa la intersección del intervalo
+	# invocante y el argumento +other+
+	#
+	def intersection_literal other
+		other
+	end
+	
+	# Método intersection_rinfinite
+	#
+	# Retorna un nuevo intervalo que representa la intersección del intervalo
+	# invocante y el argumento +other+
+	#
+	def intersection_rinfinite other
+		other
+	end
+	
+	# Método intersection_linfinite
+	#
+	# Retorna un nuevo intervalo que representa la intersección del intervalo
+	# invocante y el argumento +other+
+	#
+	def intersection_linfinite other
+		other
+	end
+	
 	# Método union
 	#
 	# Retorna un nuevo intervalo que representa la unión del
 	# intervalo invocante y el argumento +other+
 	#
 	def union other
+		self
+	end
+	
+	# Método union_literal
+	#
+	# Retorna un nuevo intervalo que representa la unión del
+	# intervalo invocante y el argumento +other+
+	#
+	def union_literal other
+		self
+	end
+
+	# Método union_rinfinite
+	#
+	# Retorna un nuevo intervalo que representa la unión del
+	# intervalo invocante y el argumento +other+
+	#
+	def union_rinfinite other
+		self
+	end
+
+	# Método union_linfinite
+	#
+	# Retorna un nuevo intervalo que representa la unión del
+	# intervalo invocante y el argumento +other+
+	#	
+	def union_linfinite other
 		self
 	end
 end
@@ -688,12 +742,66 @@ class Empty < Interval
 		self
 	end
 	
+	# Método intersection_literal
+	#
+	# Retorna un nuevo intervalo que representa la intersección del intervalo
+	# invocante y el argumento +other+
+	#
+	def intersection_literal other
+		self
+	end
+	
+	# Método intersection_rinfinite
+	#
+	# Retorna un nuevo intervalo que representa la intersección del intervalo
+	# invocante y el argumento +other+
+	#
+	def intersection_rinfinite other
+		self
+	end
+	
+	# Método intersection_linfinite
+	#
+	# Retorna un nuevo intervalo que representa la intersección del intervalo
+	# invocante y el argumento +other+
+	#
+	def intersection_linfinite other
+		self
+	end
+	
 	# Método union
 	#
 	# Retorna un nuevo intervalo que representa la unión del
 	# intervalo invocante y el argumento +other+
 	#
 	def union other
+		other
+	end
+	
+	# Método union_literal
+	#
+	# Retorna un nuevo intervalo que representa la unión del
+	# intervalo invocante y el argumento +other+
+	#
+	def union_literal other
+		other
+	end
+
+	# Método union_rinfinite
+	#
+	# Retorna un nuevo intervalo que representa la unión del
+	# intervalo invocante y el argumento +other+
+	#
+	def union_rinfinite other
+		other
+	end
+
+	# Método union_linfinite
+	#
+	# Retorna un nuevo intervalo que representa la unión del
+	# intervalo invocante y el argumento +other+
+	#	
+	def union_linfinite other
 		other
 	end
 end
