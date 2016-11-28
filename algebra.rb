@@ -724,12 +724,9 @@ el_hash = Hash.new($reales)
 print "Ingrese el nombre del archivo a cargar: "
 archivo = gets.chomp
 IO.foreach(archivo) do |line|
-	# Se separa cada linea por los '|'
-	arr = line.chomp.split(" | ")
-	
-	# Luego se separa cada separación anterior por '&' 
-	i = 0
-	arr.each {|elem| arr[i] = elem.split(" & "); i += 1}
+	# Se separa cada linea por los '|', luego se separa cada separación
+	# anterior por '&'
+	arr = line.chomp.split(" | ").map {|elem| elem.split(" & ")}
 	
 	# Se crean todos los intervalos y se operan las
 	# intersecciones primero 
@@ -761,13 +758,13 @@ IO.foreach(archivo) do |line|
 		el_hash[line[0]] = el_hash[line[0]].intersection aux
 	end
 end
-# Se muestran las variables disponibles
-puts "Las variables disponibles son:"
-el_hash.each {|key,value| puts "  #{key} in #{value}"}
-puts
 
 # La Calculadora
 while true
+	# Se muestran las variables disponibles
+	puts "Las variables disponibles son:"
+	el_hash.each {|key,value| puts "  #{key} in #{value}"}
+	puts
 	# Prompt para la calculadora
 	puts "\tIngrese «variable» «operador» «variable», donde"
 	puts "\t«operador» puede ser & ó |, y «variable» es alguna"
